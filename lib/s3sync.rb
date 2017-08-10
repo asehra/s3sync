@@ -5,7 +5,7 @@ module S3sync
 
   def self.synchronise(source, destination)
     source.objects.each do |object|
-      next if destination.objects.find { |o| o.key == object.key && o.size == object.size }
+      next if destination.objects.find { |o| o.key == object.key && o.etag == object.etag }
       copy_object source, destination, object.key
     end
   end

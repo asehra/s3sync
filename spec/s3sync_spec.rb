@@ -6,35 +6,36 @@ RSpec.describe S3sync do
   end
 
   describe '.synchronise' do
+    let(:sample_file) { Fake::Object.new(key: 'test/file', etag: 30) }
     context 'when a file in source bucket does not exist in destination bucket' do
       it 'copies the file to destination bucket' do
-        source = Fake::Bucket.new(objects: Fake::Objects('test/file'))
+        source = Fake::Bucket.new(objects: [sample_file])
         destination = Fake::Bucket.new
 
-        expect(S3sync).to receive(:copy_object).with(source, destination, 'test/file')
+        expect(S3sync).to receive(:copy_object).with(source, destination, sample_file.key)
         S3sync.synchronise(source, destination)
       end
     end
 
     context 'when a file in source bucket exists in destination bucket' do
       it 'does not copy the file to destination bucket' do
-        source = Fake::Bucket.new(objects: [Fake::Object.new(key: 'test/file', size: 30)])
-        destination = Fake::Bucket.new(objects: [Fake::Object.new(key: 'test/file', size: 30)])
+        source = Fake::Bucket.new(objects: [sample_file])
+        destination = Fake::Bucket.new(objects: [sample_file])
 
-        expect(S3sync).to_not receive(:copy_object).with(source, destination, 'test/file')
+        expect(S3sync).to_not receive(:copy_object).with(source, destination, sample_file.key)
         S3sync.synchronise(source, destination)
       end
     end
 
     context 'when multiple files need to be synced' do
       it 'does not copy the matching files to destination bucket' do
-        existing_file = Fake::Object.new(key: 'test/file', size: 30)
+        existing_file = sample_file
         source = Fake::Bucket.new(objects: [
-          Fake::Object.new(key: 'missing/file/1', size: 50),
-          Fake::Object.new(key: 'test/file', size: 30),
-          Fake::Object.new(key: 'another/folder/with/missing/file', size: 20)
+          Fake::Object.new(key: 'missing/file/1', etag: 50),
+          sample_file,
+          Fake::Object.new(key: 'another/folder/with/missing/file', etag: 20)
         ])
-        destination = Fake::Bucket.new(objects: [Fake::Object.new(key: 'test/file', size: 30)])
+        destination = Fake::Bucket.new(objects: [sample_file.dup])
 
         expect(S3sync).to receive(:copy_object).with(source, destination, 'missing/file/1')
         expect(S3sync).to receive(:copy_object).with(source, destination, 'another/folder/with/missing/file')
@@ -43,10 +44,10 @@ RSpec.describe S3sync do
       end
     end
 
-    context 'when a file exists in both buckets but has different sizes' do
+    context 'when a file exists in both buckets but has different etags' do
       it 'copies the file to destination bucket' do
-        source = Fake::Bucket.new(objects: [Fake::Object.new(key: 'test/file', size: 10)])
-        destination = Fake::Bucket.new(objects: [Fake::Object.new(key: 'test/file', size: 20)])
+        source = Fake::Bucket.new(objects: [Fake::Object.new(key: 'test/file', etag: 10)])
+        destination = Fake::Bucket.new(objects: [Fake::Object.new(key: 'test/file', etag: 20)])
 
         expect(S3sync).to receive(:copy_object).with(source, destination, 'test/file')
         S3sync.synchronise(source, destination)

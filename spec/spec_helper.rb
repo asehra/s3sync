@@ -11,16 +11,12 @@ class Fake
   end
 
   class Object
-    attr_accessor :key, :size
+    attr_accessor :key, :etag
 
-    def initialize(key:, size:)
+    def initialize(key:, etag:)
       @key = key
-      @size = size
+      @etag = etag
     end
-  end
-
-  def self.Objects(*keys)
-    keys.map { |key| Object.new(key: key, size: rand(20)) }
   end
 end
 
