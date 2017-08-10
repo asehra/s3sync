@@ -10,6 +10,8 @@ module S3sync
   end
 
   def self.copy_path(source, destination, path)
-
+    source.download(path) do |local_path|
+      destination.upload(local_path, path)
+    end
   end
 end

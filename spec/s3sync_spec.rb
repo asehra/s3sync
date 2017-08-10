@@ -56,9 +56,14 @@ RSpec.describe S3sync do
 
   describe '.copy_path' do
     let(:path) { 'test/file' }
+    let(:local_path) { 'local/path' }
     let(:source) { Fake::Bucket.new(files: [path])}
     let(:destination) { Fake::Bucket.new }
 
-    it 'downloads the file locally and uploads to destination'
+    it 'downloads the file locally and uploads to destination' do
+      expect(source).to receive(:download).with(path).and_yield(local_path)
+      expect(destination).to receive(:upload).with(local_path, path)
+      S3sync.copy_path(source, destination, path)
+    end
   end
 end
