@@ -1,4 +1,5 @@
 require "s3sync/version"
+require "s3sync/bucket"
 
 module S3sync
 
