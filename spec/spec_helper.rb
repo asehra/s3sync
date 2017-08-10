@@ -3,24 +3,24 @@ require "s3sync"
 
 class Fake
   class Bucket
-    attr_accessor :files
+    attr_accessor :objects
 
-    def initialize(files: [])
-      @files = files
+    def initialize(objects: [])
+      @objects = objects
     end
   end
 
-  class File
-    attr_accessor :path, :size
+  class Object
+    attr_accessor :key, :size
 
-    def initialize(path:, size:)
-      @path = path
+    def initialize(key:, size:)
+      @key = key
       @size = size
     end
   end
 
-  def self.Files(*paths)
-    paths.map { |path| File.new(path: path, size: rand(20)) }
+  def self.Objects(*keys)
+    keys.map { |key| Object.new(key: key, size: rand(20)) }
   end
 end
 

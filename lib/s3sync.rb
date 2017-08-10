@@ -3,15 +3,15 @@ require "s3sync/version"
 module S3sync
 
   def self.synchronise(source, destination)
-    source.files.each do |file|
-      next if destination.files.find { |f| f.path == file.path && f.size == file.size }
-      copy_path source, destination, file.path
+    source.objects.each do |object|
+      next if destination.objects.find { |o| o.key == object.key && o.size == object.size }
+      copy_object source, destination, object.key
     end
   end
 
-  def self.copy_path(source, destination, path)
-    source.download(path) do |local_path|
-      destination.upload(local_path, path)
+  def self.copy_object(source, destination, key)
+    source.download(key) do |local_file|
+      destination.upload(local_file, key)
     end
   end
 end
