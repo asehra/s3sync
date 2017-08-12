@@ -58,11 +58,11 @@ module S3sync
       it "uploads a file to specified key" do
         begin
           file = Tempfile.new
-          expect(bucket.client).to receive(:put_object).with({
-              body: file.path,
-              bucket: bucket.name,
-              key: "some/key"
-            })
+          expect(bucket.client).to receive(:put_object).with(
+            body: file.path,
+            bucket: bucket.name,
+            key: "some/key"
+          )
           bucket.upload(file, "some/key")
         ensure
           file.unlink unless file.nil?
