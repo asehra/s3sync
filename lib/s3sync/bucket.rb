@@ -27,6 +27,14 @@ module S3sync
       file.unlink
     end
 
+    def upload(file, key)
+      client.put_object({
+        body: file.path,
+        bucket: name,
+        key: key
+      })
+    end
+
     def self.connect(url:,access_key_id:,secret_access_key:, region: "eu-west-1", bucket_name:)
       client = Aws::S3::Client.new(
         endpoint: url,

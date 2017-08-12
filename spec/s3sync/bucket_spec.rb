@@ -50,5 +50,24 @@ module S3sync
         expect { file_reference.read }.to raise_error(IOError)
       end
     end
+
+    describe "#upload" do
+      let(:put_object_response) { { put_object: {} } }
+      subject(:bucket) { Bucket.new(client: s3_client(put_object_response), name: "test") }
+
+      it "uploads a file to specified key" do
+        begin
+          file = Tempfile.new
+          expect(bucket.client).to receive(:put_object).with({
+              body: file.path,
+              bucket: bucket.name,
+              key: "some/key"
+            })
+          bucket.upload(file, "some/key")
+        ensure
+          file.unlink unless file.nil?
+        end
+      end
+    end
   end
 end
