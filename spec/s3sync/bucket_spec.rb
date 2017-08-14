@@ -59,7 +59,7 @@ module S3sync
         begin
           file = Tempfile.new
           expect(bucket.client).to receive(:put_object).with(
-            body: file.path,
+            body: file,
             bucket: bucket.name,
             key: "some/key"
           )

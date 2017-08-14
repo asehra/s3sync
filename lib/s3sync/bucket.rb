@@ -28,7 +28,7 @@ module S3sync
     end
 
     def upload(file, key)
-      client.put_object(body: file.path, bucket: name, key: key)
+      client.put_object(body: file, bucket: name, key: key)
     end
 
     def self.connect(url:,access_key_id:,secret_access_key:, region: "eu-west-1", bucket_name:)
